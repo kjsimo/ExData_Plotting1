@@ -1,0 +1,17 @@
+library(tools)
+library(data.table)
+library(gsubfn)
+library(dplyr)
+library(jpeg)
+library(sqldf)
+library(Hmisc)
+library(lubridate)
+
+powerData <- fread("household_power_consumption.txt", na.strings=c("NA","N/A","", "?"))
+selectData <- subset(powerData, Date == "1/2/2007" | Date == "2/2/2007" )
+subPowerData <- mutate(selectData, Date = as.Date(Date, "%d/%m/%Y"))
+subPowerData <- mutate(subPowerData, Global_active_power = as.numeric(Global_active_power))
+hist(subPowerData$Global_active_power, col = "red", main = "Global Active Power", 
+     xlab = "Global Active Power (kilowatts)")
+dev.copy(png, file = "plot1.png")
+dev.off()

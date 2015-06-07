@@ -1,0 +1,26 @@
+library(tools)
+library(data.table)
+library(gsubfn)
+library(dplyr)
+library(Hmisc)
+library(lubridate)
+
+powerData <- fread("household_power_consumption.txt", na.strings=c("NA","N/A","", "?"))
+selectData <- subset(powerData, Date == "1/2/2007" | Date == "2/2/2007" )
+subPowerData <- mutate(selectData, Date = as.Date(Date, "%d/%m/%Y"))
+x <- subPowerData$Date
+y <- subPowerData$Time
+dateTime <- paste(x,y)
+dateTime <- strptime(dateTime, "%Y-%m-%d %H:%M:%S")
+subPowerData <- cbind(dateTime, subPowerData)
+subPowerData <- mutate(subPowerData, Global_active_power = as.numeric(Global_active_power))
+subPowerData <- mutate(subPowerData, Sub_metering_1 = as.numeric(Sub_metering_1))
+subPowerData <- mutate(subPowerData, Sub_metering_2 = as.numeric(Sub_metering_2))
+subPowerData <- mutate(subPowerData, Sub_metering_3 = as.numeric(Sub_metering_3))
+
+with(subPowerData, plot(dateTime,Sub_metering_1 , type = "l", xlab = NA, ylab = "Energy sub metering"))
+with(subPowerData, lines(dateTime, Sub_metering_2, col = "red"))
+with(subPowerData, lines(dateTime, Sub_metering_3, col = "blue"))
+legend("topright", lty = 1, col = c("black", "blue", "red"), legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"))
+dev.copy(png, file = "./ExData_Plotting1/plot3.png")
+dev.off()
